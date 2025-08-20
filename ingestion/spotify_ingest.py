@@ -45,7 +45,7 @@ for id in my_follower_ids:
 
 all_playlists_df = pd.concat([my_playlists_df, follower_playlists_df])
 
-
+print("Getting playlists' tracks! ")
 playlist_tracks = {}
 for pl_id in all_playlists_df['uri']:
     offset=0
@@ -96,11 +96,13 @@ headers = {
   'Accept': 'application/json'
 }
 
-
+print("Getting tracks! ")
 response_content = []
-counter=0
+counter = 0
 for playlist_id, track_ids in all_tracks.items():
+    
     for batch in batched(track_ids, 10):
+        counter += 1 
         id_str = ""
         for track_id in batch:
             id_str = id_str + f"ids={track_id}&"
@@ -110,10 +112,8 @@ for playlist_id, track_ids in all_tracks.items():
         res = conn.getresponse()
         data = res.read()
         response_content.append(json.loads(data)['content'])
-    counter +=1
-    if counter == 10:
-        break
-    time.sleep(3)
+        if counter % 50 == 0:
+            time.sleep(3)
 
 response_content = [x for xs in response_content for x in xs]
 reccobeats_ids = {}
@@ -124,15 +124,15 @@ for track in response_content:
 
 conn = http.client.HTTPSConnection("api.reccobeats.com")
 
+print("Getting track features! ")
+counter = 0
 track_audio_features = {}
-counter=0
 for spotify_id, track_id in reccobeats_ids.items():
     conn.request("GET", f"/v1/track/{track_id}/audio-features", payload, headers)
     res = conn.getresponse()
     track_audio_features[spotify_id] = json.loads(res.read())
-    counter+=1
-    if counter == 100:
-        break
+    if counter % 50 == 0:
+        time.sleep(3)
 
 
 track_audio_features_df = pd.DataFrame.from_dict(track_audio_features, orient='index').reset_index().rename(columns={'id': 'reccobeats_id','index': 'id'})
@@ -145,3 +145,7 @@ final_listening_history_table = my_listening_history_df[['played_at', 'track.id'
 print(final_playlist_table)
 print(final_tracks_table)
 print(final_listening_history_table)
+
+final_playlist_table.to_csv("final_playlist_table.csv")
+final_tracks_table.to_csv("final_tracks_table.csv")
+final_listening_history_table.to_csv("final_listening_history_table.csv")
