@@ -21,7 +21,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     redirect_uri=REDIRECT_URI,
     scope="playlist-read-private,user-top-read,user-library-read,user-read-recently-played,user-follow-read,playlist-read-collaborative"))
 
-my_playlists = sp.current_user_playlists(limit=50)
+my_playlists = sp.current_user_playlists(limit=15)
 my_listening_history = sp.current_user_recently_played(limit=50)
 my_playlists_df = pd.json_normalize(my_playlists['items'])
 my_listening_history_df = pd.json_normalize(my_listening_history['items'])
@@ -38,7 +38,7 @@ for id in my_follower_urls:
 
 follower_playlists_df = pd.DataFrame()
 for id in my_follower_ids:
-    follower_playlists = sp.user_playlists(id)
+    follower_playlists = sp.user_playlists(id, limit=15)
     df = pd.json_normalize(follower_playlists['items'])
     follower_playlists_df = pd.concat([follower_playlists_df, df], ignore_index=True)
     
@@ -69,12 +69,22 @@ for playlist_id, playlist in playlist_tracks.items():
     all_tracks[playlist_id] = []
     for item in playlist:
         if item['track'] is not None:
-            all_tracks[playlist_id].append(item['track']['id'])
-            playlist_tracks_info[item['track']['id']] = {'name': item['track']['name'], 'uri': item['track']['uri'], 'popularity': item['track']['popularity'], 'duration': item['track']['duration_ms'], 'artists': [{artist_item['id']: artist_item['name']} for artist_item in item['track']['artists']]}
-            if 'included_in' not in playlist_tracks_info[item['track']['id']].keys():
-                playlist_tracks_info[item['track']['id']] = {'included_in': [playlist_id]}
+            track_id = item['track']['id']
+            all_tracks[playlist_id].append(track_id)
+            if track_id not in playlist_tracks_info:
+                playlist_tracks_info[track_id] = {
+                    'name': item['track']['name'],
+                    'uri': item['track']['uri'],
+                    'popularity': item['track']['popularity'],
+                    'duration': item['track']['duration_ms'],
+                    'artists': [
+                        {artist_item['id']: artist_item['name']}
+                        for artist_item in item['track']['artists']
+                    ],
+                    'included_in': [playlist_id]
+                }
             else:
-                playlist_tracks_info[item['track']['id']['included_in']].append(playlist_id)
+                playlist_tracks_info[track_id]['included_in'].append(playlist_id)
 
 playlist_tracks_info_df = pd.DataFrame.from_dict(playlist_tracks_info, orient='index').reset_index().rename(columns={'index': 'id'})
 
@@ -100,11 +110,11 @@ print("Getting tracks! ")
 response_content = []
 counter = 0
 for playlist_id, track_ids in all_tracks.items():
-    
     for batch in batched(track_ids, 10):
-        counter += 1 
+        counter += 1
+
         id_str = ""
-        for track_id in batch:
+        for track_id in batch: 
             id_str = id_str + f"ids={track_id}&"
         id_str = id_str[:-1]
         
@@ -112,8 +122,10 @@ for playlist_id, track_ids in all_tracks.items():
         res = conn.getresponse()
         data = res.read()
         response_content.append(json.loads(data)['content'])
-        if counter % 50 == 0:
+        if counter % 10 == 0:
             time.sleep(3)
+    if counter > 200:
+        break
 
 response_content = [x for xs in response_content for x in xs]
 reccobeats_ids = {}
@@ -128,10 +140,11 @@ print("Getting track features! ")
 counter = 0
 track_audio_features = {}
 for spotify_id, track_id in reccobeats_ids.items():
+    counter += 1
     conn.request("GET", f"/v1/track/{track_id}/audio-features", payload, headers)
     res = conn.getresponse()
     track_audio_features[spotify_id] = json.loads(res.read())
-    if counter % 50 == 0:
+    if counter % 20 == 0:
         time.sleep(3)
 
 
@@ -146,6 +159,6 @@ print(final_playlist_table)
 print(final_tracks_table)
 print(final_listening_history_table)
 
-final_playlist_table.to_csv("final_playlist_table.csv")
-final_tracks_table.to_csv("final_tracks_table.csv")
-final_listening_history_table.to_csv("final_listening_history_table.csv")
+final_playlist_table.to_csv("final_playlist_table.csv", index=False)
+final_tracks_table.to_csv("final_tracks_table.csv", index=False)
+final_listening_history_table.to_csv("final_listening_history_table.csv", index=False)
