@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: dim_playlists_cleansed
+    columns:
+
+      - name: playlist_id
+        tests:
+        - unique
+        - not_null
+      
+      - name: playlist_name
+        tests:
+        - not_null
+      
+      - name: owner_name
+        tests:
+        - not_null
+
+      - name: owner_id
+        tests:
+        - unique
+        - not_null
+
+      - name: owner_uri
+        tests:
+        - unique
+        - not_null
+
+      - name: total_tracks
+        tests:
+          - positive_value
+    
+  - name: dim_tracks_cleansed
+    columns:
+
+      - name: track_id
+        tests:
+          - not_null
+          - unique
+    
+      - name: track_name
+        tests:
+          - not_null
+
+      - name: track_uri
+        tests:
+          - not_null
+          - unique
+
+      - name: artists
+        tests:
+          - not_null
+
+      - name: reccobeats_id
+        tests:
+          - not_null
+          - unique
+     
+      - name: included_in
+        tests:
+          - not_null
+
+      - name: mode
+        tests:
+          - accepted_values: 
+              values: [0, 1]
+
+  - name: fct_listening_history
+    columns:
+      - name: played_at
+        tests: 
+          - not_null
+          - unique
+    
+      - name: track_id
+        tests: 
+          - not_null
+    
+      - name: track_name
+        tests: 
+          - not_null
+    
+      - name: track_uri
+        tests: 
+          - not_null

@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: spotify
+    schema: raw
+    tables:
+      - name: playlists
+        identifier: raw_playlists
+      
+      - name: tracks
+        identifier: raw_tracks
+
+      - name: listening_history
+        identifier: raw_listening_history
+        loaded_at_field: played_at
+        freshness:
+            warn_after: { count: 24, period: hour}
+            error_after: { count: 48, period: hour}
