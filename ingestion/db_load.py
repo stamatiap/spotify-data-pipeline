@@ -52,6 +52,11 @@ except Exception as e:
 try:
     cur.execute("""CREATE OR REPLACE TABLE raw_tracks
                 (id string,
+                name string,
+                uri string,
+                popularity integer,
+                duration integer,
+                artists string,
                 included_in string,
                 reccobeats_id string,
                 acousticness float,
