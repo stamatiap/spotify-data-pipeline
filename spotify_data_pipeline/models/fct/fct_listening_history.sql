@@ -10,7 +10,7 @@ WITH src_listening_history AS (
     SELECT * FROM {{ref("src_listening_history")}}
 )
 
-SELECT
+SELECT {{ dbt_utils.generate_surrogate_key(['played_at', 'track_id', 'track_name', 'track_uri']) }} as listen_id,
     played_at,
     track_id,
     track_name,
