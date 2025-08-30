@@ -16,7 +16,7 @@ playlist_owners AS (
     SELECT * 
     FROM {{ ref('dim_playlist_cleansed') }}
 
-),
+)
 
 SELECT
     pt.track_id,
