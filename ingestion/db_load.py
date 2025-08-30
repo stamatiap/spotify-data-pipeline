@@ -28,7 +28,7 @@ except Exception as e:
 
 # Use Spotify Schema
 try: 
-    conn.cursor().execute("USE SCHEMA SPOTIFY.RAW;")
+    cur.execute("USE SCHEMA SPOTIFY.RAW;")
 except Exception as e:
     print("Schema error!")
     print(f"Error: {e}")
