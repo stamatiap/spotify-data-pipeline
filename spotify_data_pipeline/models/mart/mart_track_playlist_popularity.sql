@@ -1,3 +1,9 @@
+{{
+  config(
+    materialized = 'table',
+    )
+}}
+
 WITH playlist_tracks AS (
     SELECT * FROM {{ref("map_playlist_tracks")}}
 )
