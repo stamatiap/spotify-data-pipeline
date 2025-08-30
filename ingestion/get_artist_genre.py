@@ -51,8 +51,6 @@ except Exception as e:
     print(f"Error: {e}")
 
 artist_ids = [item[0] for item in cur.fetchall()]
-print(artist_ids)
-
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     client_id=CLIENT_ID,
