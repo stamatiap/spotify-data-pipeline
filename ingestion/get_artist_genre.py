@@ -70,4 +70,7 @@ for artist_id in artist_ids:
 
 artist_genre_df = pd.DataFrame.from_dict(artist_genre, orient='index').reset_index().rename(columns={"index": "artist_id"})
 
+for i, column in enumerate(list(artist_genre_df.columns)[1:]):
+    artist_genre_df = artist_genre_df.rename(columns={f"{column}": f"genre_{i}"})
+
 artist_genre_df.to_csv("artist_genre_table.csv", index=False)
