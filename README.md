@@ -28,3 +28,14 @@ It automates the process of fetching data from the **Spotify Web API**, loading 
 - **SQL** – data querying and exploration  
 - **dbt** – data transformations, testing, and modeling  
 - *(Future: Power BI, Airflow)*
+
+---
+
+  ## 💡 Future Work
+
+- Develop a **similarity model** to detect shared music tastes between users.  
+- Build a **song recommendation engine** using transformed data.  
+- Automate and orchestrate the pipeline with **Airflow**.  
+- Create a **Power BI dashboard** for playlist and artist analytics.
+
+---
