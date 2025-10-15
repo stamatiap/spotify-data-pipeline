@@ -1,15 +1,20 @@
-Welcome to your new dbt project!
+# 🧠 dbt Project – Spotify Data Pipeline
 
-### Using the starter project
+This dbt project contains the **transformation layer** of the Spotify Data Pipeline.  
+It models and organizes data loaded into Snowflake from the Spotify API, transforming it into analytics-ready tables for analysis, dashboards, and recommendation insights.
 
-Try running the following commands:
-- dbt run
-- dbt test
+---
 
+## 🎯 Purpose
 
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+- **Staging models**: clean and map raw Spotify data into well-structured intermediate tables.  
+- **Marts**: aggregate and analyze metrics such as track, playlist, and artist popularity to support insights and dashboards.
+
+---
+
+## 🛠️ Usage
+
+Inside the `spotify_data_pipeline/` folder:
+
+- Run transformations: ``` dbt run```.
+- Test and validate models: ```dbt test```.
